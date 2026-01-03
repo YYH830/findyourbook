@@ -1,0 +1,5 @@
+{
+  "name": "LibriSearch AI",
+  "description": "An AI-powered ebook finder that searches open libraries and web archives for downloadable content.",
+  "requestFramePermissions": []
+}
