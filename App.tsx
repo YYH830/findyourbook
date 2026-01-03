@@ -3,8 +3,10 @@ import SearchBar from './components/SearchBar';
 import BookCard from './components/BookCard';
 import { searchBooks } from './services/geminiService';
 import { BookResult, SearchState } from './types';
+import { useLanguage } from './contexts/LanguageContext';
 
 const App: React.FC = () => {
+  const { t, toggleLanguage, language } = useLanguage();
   const [state, setState] = useState<SearchState>({
     query: '',
     isLoading: false,
@@ -24,14 +26,28 @@ const App: React.FC = () => {
         ...prev, 
         isLoading: false, 
         results: [], 
-        error: "We encountered an issue connecting to the library database. Please try again later." 
+        // Use translation for error. Note: dynamic error messages from API might still be English but general failure is translated.
+        error: t.error
       }));
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-800 font-sans selection:bg-indigo-100 selection:text-indigo-800">
+    <div className="min-h-screen bg-slate-50 text-gray-800 font-sans selection:bg-indigo-100 selection:text-indigo-800 relative">
       
+      {/* Language Switcher */}
+      <div className="absolute top-4 right-4 z-10">
+        <button 
+          onClick={toggleLanguage}
+          className="px-4 py-2 bg-white text-indigo-600 text-sm font-semibold rounded-full shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors flex items-center gap-2"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+          </svg>
+          {t.toggleBtn}
+        </button>
+      </div>
+
       {/* Hero Section */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
@@ -46,7 +62,7 @@ const App: React.FC = () => {
             LibriSearch <span className="text-indigo-600">AI</span>
           </h1>
           <p className="max-w-2xl mx-auto text-lg text-slate-600 mb-8">
-            Instantly find downloadable ebooks, PDFs, and open-access documents from libraries and archives across the web.
+            {t.subtitle}
           </p>
           
           <SearchBar onSearch={handleSearch} isLoading={state.isLoading} />
@@ -80,8 +96,8 @@ const App: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Smart Search</h3>
-              <p className="text-gray-500 text-sm">Our AI scans the web for the most relevant file repositories.</p>
+              <h3 className="font-bold text-gray-900 mb-2">{t.smartSearch}</h3>
+              <p className="text-gray-500 text-sm">{t.smartSearchDesc}</p>
             </div>
             <div className="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -89,8 +105,8 @@ const App: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Direct Access</h3>
-              <p className="text-gray-500 text-sm">We try to link directly to PDF or download pages when available.</p>
+              <h3 className="font-bold text-gray-900 mb-2">{t.directAccess}</h3>
+              <p className="text-gray-500 text-sm">{t.directAccessDesc}</p>
             </div>
             <div className="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -98,8 +114,8 @@ const App: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                 </svg>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Legal Sources</h3>
-              <p className="text-gray-500 text-sm">Prioritizes open libraries like Project Gutenberg and Internet Archive.</p>
+              <h3 className="font-bold text-gray-900 mb-2">{t.legalSources}</h3>
+              <p className="text-gray-500 text-sm">{t.legalSourcesDesc}</p>
             </div>
           </div>
         )}
@@ -107,8 +123,8 @@ const App: React.FC = () => {
         {/* Results Grid */}
         {state.hasSearched && !state.isLoading && state.results.length === 0 && !state.error && (
              <div className="text-center py-20">
-                <p className="text-xl text-gray-500">No results found for "{state.query}".</p>
-                <p className="text-gray-400 mt-2">Try checking the spelling or searching for a different book.</p>
+                <p className="text-xl text-gray-500">{t.noResults} "{state.query}".</p>
+                <p className="text-gray-400 mt-2">{t.tryChecking}</p>
             </div>
         )}
 
@@ -122,7 +138,7 @@ const App: React.FC = () => {
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-sm text-gray-400">
-            © {new Date().getFullYear()} LibriSearch AI. Links are provided by search engines. Please ensure compliance with copyright laws in your region.
+            © {new Date().getFullYear()} LibriSearch AI. {t.footer}
           </p>
         </div>
       </footer>

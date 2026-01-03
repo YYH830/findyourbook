@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -7,6 +8,7 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading }) => {
   const [input, setInput] = useState('');
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,13 +32,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
-            placeholder="Search for an ebook (e.g., 'Pride and Prejudice', 'Learn React')..."
+            placeholder={t.placeholder}
             className="w-full p-5 text-gray-700 bg-transparent rounded-lg focus:outline-none text-lg disabled:cursor-not-allowed"
           />
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="mr-2 px-8 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mr-2 px-8 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
           >
             {isLoading ? (
               <span className="flex items-center">
@@ -44,10 +46,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading }) => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Searching
+                {t.searching}
               </span>
             ) : (
-              'Search'
+              t.search
             )}
           </button>
         </div>
